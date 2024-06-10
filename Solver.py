@@ -1,5 +1,6 @@
 from Pyro4 import expose
 import random
+import time
 
 class Solver:
     def __init__(self, workers=None, input_file_name=None, output_file_name=None):
@@ -12,11 +13,14 @@ class Solver:
         print("Job Started")
         print("Workers %d" % len(self.workers))
 
+        current_timestamp = time.time()
+        print("Current Timestamp:", current_timestamp)
+
         (n, k) = self.read_input()
         a = 1 << n
         b = 1 << (n + 1)
-        step_n = (b - a) // len(self.workers)  # Use integer division
-        step_k = k // len(self.workers)        # Use integer division
+        step_n = (b - a) // len(self.workers)
+        step_k = k // len(self.workers)
 
         # map
         mapped = []
@@ -33,6 +37,9 @@ class Solver:
         self.write_output(primes)
 
         print("Job Finished")
+        current_timestamp_2 = time.time()
+        print("Current Timestamp:", current_timestamp_2)
+        print("total time: ",  current_timestamp_2 - current_timestamp)
 
     @staticmethod
     @expose
