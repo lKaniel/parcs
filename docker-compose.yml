@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  parcs-main:
+    image: registry.hub.docker.com/hummer12007/parcs-node
+    ports:
+      - "127.0.0.1:8080:8080"            # LocalStack Gateway
+    environment:
+      - PARCS_ARGS=master
+  parcs-worker1:
+    image: registry.hub.docker.com/hummer12007/parcs-node          # LocalStack Gateway
+    environment:
+      - PARCS_ARGS=worker 10.5.0.5
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
+         aux_addresses:
+          parcs-main: 10.5.0.5
+          parcs-worker1: 10.5.0.6

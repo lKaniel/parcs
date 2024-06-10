@@ -1,6 +1,7 @@
+# import gmpy2
 from Pyro4 import expose
 import random
-import time
+
 
 class Solver:
     def __init__(self, workers=None, input_file_name=None, output_file_name=None):
@@ -13,22 +14,17 @@ class Solver:
         print("Job Started")
         print("Workers %d" % len(self.workers))
 
-        current_timestamp = time.time()
-        print("Current Timestamp:", current_timestamp)
-
         (n, k) = self.read_input()
         a = 1 << n
         b = 1 << (n + 1)
-        step_n = (b - a) // len(self.workers)
-        step_k = k // len(self.workers)
+        step_n = (b - a) / len(self.workers)
+        step_k = k / len(self.workers)
 
         # map
         mapped = []
-        for i in range(len(self.workers)):
+        for i in xrange(0, len(self.workers)):
             print("map %d" % i)
-            start_range = a + i * step_n
-            end_range = a + (i + 1) * step_n
-            mapped.append(self.workers[i].mymap(str(start_range), str(end_range), step_k))
+            mapped.append(self.workers[i].mymap(str(a + i * step_n), str(a + (i + 1) * step_n), step_k))
 
         # reduce
         primes = self.myreduce(mapped)
@@ -37,9 +33,6 @@ class Solver:
         self.write_output(primes)
 
         print("Job Finished")
-        current_timestamp_2 = time.time()
-        print("Current Timestamp:", current_timestamp_2)
-        print("total time: ",  current_timestamp_2 - current_timestamp)
 
     @staticmethod
     @expose
@@ -49,7 +42,6 @@ class Solver:
         print(count)
         a = int(a)
         b = int(b)
-        count = int(count)  # Ensure count is an integer
         primes = []
 
         if a % 2 == 0:
@@ -65,25 +57,24 @@ class Solver:
     @staticmethod
     @expose
     def myreduce(mapped):
-        print("reduce")
         output = []
 
         for primes in mapped:
-            print("reduce loop")
-            output += primes  # Directly concatenate the lists
-        print("reduce done")
+            output = output + primes.value
         return output
 
     def read_input(self):
-        with open(self.input_file_name, 'r') as f:
-            n = int(f.readline())
-            k = int(f.readline())
+        f = open(self.input_file_name, 'r')
+        n = int(f.readline())
+        k = int(f.readline())
+        f.close()
         return n, k
 
     def write_output(self, output):
-        with open(self.output_file_name, 'w') as f:
-            f.write(', '.join(output))
-            f.write('\n')
+        f = open(self.output_file_name, 'w')
+        f.write(', '.join(output))
+        f.write('\n')
+        f.close()
         print("output done")
 
     @staticmethod
@@ -103,7 +94,6 @@ class Solver:
             s += 1
             d = quotient
         assert (2 ** s * d == n - 1)
-
         def try_composite(a):
             if pow(a, d, n) == 1:
                 return False

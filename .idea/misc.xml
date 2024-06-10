@@ -3,8 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.11 (parcs)" />
   </component>
-  <component name="GithubDefaultAccount">
-    <option name="defaultAccountId" value="9c056189-693a-4f72-81af-00df36878dd0" />
-  </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (parcs)" project-jdk-type="Python SDK" />
 </project>
